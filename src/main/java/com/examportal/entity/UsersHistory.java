@@ -15,9 +15,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "usersHistoryId")
+@Table(name="user_History")
 public class UsersHistory {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
@@ -26,16 +28,14 @@ public class UsersHistory {
 	@OneToOne(cascade=CascadeType.ALL)
 	@JoinColumn(name="user_id")
 	private User users;
-	@OneToOne
-	@JoinColumn(name="test_id")
-	private Test testManagement;
-	@OneToOne
-	@JoinColumn(name="exam_score")
-	private UserResults userResults;
+	@OneToMany(mappedBy="usersHistory")
+	private List<Test> testManagement;
+	@OneToMany(mappedBy="usersHistory")
+	private List<UserResults> userResults;
 	public UsersHistory() {
 		
 	}
-	public UsersHistory(int usersHistoryId, User users, Test testManagement, UserResults userResults) {
+	public UsersHistory(int usersHistoryId, User users, List<Test> testManagement, List<UserResults> userResults) {
 		super();
 		this.usersHistoryId = usersHistoryId;
 		this.users = users;
@@ -54,16 +54,16 @@ public class UsersHistory {
 	public void setUsers(User users) {
 		this.users = users;
 	}
-	public Test getTestManagement() {
+	public List<Test> getTestManagement() {
 		return testManagement;
 	}
-	public void setTestManagement(Test testManagement) {
+	public void setTestManagement(List<Test> testManagement) {
 		this.testManagement = testManagement;
 	}
-	public UserResults getUserResults() {
+	public List<UserResults> getUserResults() {
 		return userResults;
 	}
-	public void setUserResults(UserResults userResults) {
+	public void setUserResults(List<UserResults> userResults) {
 		this.userResults = userResults;
 	}
 	

@@ -1,4 +1,4 @@
-package com.examportal.serviceimpl;
+package com.examportal.dto;
 
 import java.util.List;
 

@@ -1,9 +1,11 @@
 package com.examportal.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
 
 import com.examportal.entity.Test;
 import com.examportal.entity.User;
@@ -12,5 +14,12 @@ import com.examportal.entity.UserResults;
 public interface UserResultsRepository extends JpaRepository<UserResults,Integer> {
 
 	Optional<UserResults> findByUserAndTest(User user, Test test);
+
+	List<UserResults> findByUser(User user);
+	List<UserResults> findByUser_UserId(int userId);
+
+	
+	
+	
 
 }

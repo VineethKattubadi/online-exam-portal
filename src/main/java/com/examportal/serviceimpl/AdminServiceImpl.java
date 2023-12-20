@@ -6,18 +6,24 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.examportal.dto.ResultDto;
+import com.examportal.entity.Admin;
 import com.examportal.entity.Questions;
 import com.examportal.entity.Test;
 import com.examportal.entity.User;
 import com.examportal.entity.UserResults;
 import com.examportal.iservice.AdminService;
+import com.examportal.repository.AdminRepository;
 import com.examportal.repository.TestRepository;
 import com.examportal.repository.UserRepository;
 import com.examportal.repository.UserResultsRepository;
-
+@Service
 public class AdminServiceImpl  implements AdminService {
+	
+	@Autowired
+	private AdminRepository adminRepository;
 	
 	@Autowired
 	private UserRepository userRepository;
@@ -29,7 +35,24 @@ public class AdminServiceImpl  implements AdminService {
 	private UserResultsRepository userResultsRepository;
 	
 	
+	public Admin login(String adminMail, String adminPassword) {
+	    Admin existingAdmin = adminRepository.findByAdminMail(adminMail);
+
+	    if (existingAdmin != null) {
+	        if (existingAdmin.getAdminPassword().equals(adminPassword)) {
+	            System.out.println("Login successful");
+	            return existingAdmin;
+	        } else {
+	            System.out.println("Incorrect password");
+	        }
+	    } else {
+	        System.out.println("Admin not found");
+	    }
+	    return null;
+	}
+
 	
+
 	
 	public List<ResultDto> getUserResults(int userId, int testId) {
 	    Optional<User> opUser = userRepository.findById(userId);
@@ -42,20 +65,20 @@ public class AdminServiceImpl  implements AdminService {
 	        if (isEnrolled) {
 	            Test test = testRepository.findById(testId).orElseThrow(() -> new RuntimeException("Test not found"));
 
-	            // Fetch user results
+	            
 	            UserResults userResults = userResultsRepository.findByUserAndTest(user, test)
 	                    .orElseThrow(() -> new RuntimeException("User results not found"));
 
-	            // Get user selected options
+	            
 	            Map<Integer, String> userSelectedOptions = userResults.getUserSelectedOptions();
 
-	            // Fetch questions for the test
+	            
 	            List<Questions> questions = test.getQuestions();
 
 	            // Compare user selected options with correct answers
-	            List<ResultDto> resultDtos = questions.stream()
-	                    .map(question -> {
-	                        String userSelectedOption = userSelectedOptions.get(question.getQuestionId());
+	            List<ResultDto> resultDtos = questions.stream().map(question ->
+	                     {
+	                       String userSelectedOption = userSelectedOptions.get(question.getQuestionId());
 	                        boolean isCorrect = question.getAnswer().equals(userSelectedOption);
 	                        return new ResultDto(question.getQuestionId(), question.getQuestion(),
 	                                question.getAnswer(), userSelectedOption, isCorrect);
@@ -70,6 +93,12 @@ public class AdminServiceImpl  implements AdminService {
 
 	    throw new RuntimeException("User not found");
 	}
+
+
+	
+	
+	
+	
 
 
 }

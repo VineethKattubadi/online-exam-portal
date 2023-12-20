@@ -20,7 +20,7 @@ public class QuestionServiceImpl  implements QuestionsService{
 
 
 		
-	
+// logic for the getting all the questions for users.
 
 		    @Override
 		    public List<Questions> getAllQuestions(int questionId, String question, String optionA, String optionB, String optionC, String optionD) {

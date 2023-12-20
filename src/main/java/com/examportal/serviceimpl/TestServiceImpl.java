@@ -12,13 +12,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.examportal.dto.AnswerDto;
+import com.examportal.dto.AvailableTestsDto;
 import com.examportal.dto.QuestionDto;
 import com.examportal.dto.ResultDto;
 import com.examportal.dto.TestDto;
+import com.examportal.dto.TestResultDto;
 import com.examportal.entity.Questions;
 import com.examportal.entity.Test;
 import com.examportal.entity.User;
 import com.examportal.entity.UserResults;
+import com.examportal.exception.TestServiceException;
 import com.examportal.iservice.TestService;
 import com.examportal.repository.QuestionsRepository;
 import com.examportal.repository.TestRepository;
@@ -29,6 +32,9 @@ import com.examportal.repository.UserResultsRepository;
 public class TestServiceImpl implements TestService {
 	@Autowired
 	private TestRepository testRepository;
+	
+	@Autowired
+	private TestService testService;
 
 	@Autowired
 	private QuestionsRepository questionsRepository;
@@ -39,77 +45,96 @@ public class TestServiceImpl implements TestService {
 	 @Autowired
 	 private UserResultsRepository userResultsRepository;
 
-	// adding test logic by admin
-	public TestDto addTestWithQuestions(TestDto testDto) {
-		// Convert TestDto to Test entity and save
-		Test test = new Test();
-		test.setTestId(testDto.getTestId());
-		test.setCourseType(testDto.getCourseType());
-		// other mappings...
+	// adding test logic by admin (check AdminController for HTTP PUT Requets)
 
-		test = testRepository.save(test);
+	 public TestDto addTestWithQuestions(TestDto testDto) {
+	        try {
+	            // Your existing implementation
+	            Test test = new Test();
+	            test.setTestId(testDto.getTestId());
+	            test.setCourseType(testDto.getCourseType());
+	            // other mappings...
 
-		// Convert and save questions
-		for (QuestionDto questionDto : testDto.getQuestions()) {
-			Questions question = new Questions();
-			question.setQuestionId(questionDto.getQuestionId());
-			question.setQuestion(questionDto.getQuestion());
-			question.setOptionA(questionDto.getOptionA());
-			question.setOptionB(questionDto.getOptionB());
-			question.setOptionC(questionDto.getOptionC());
-			question.setOptionD(questionDto.getOptionD());
-			question.setAnswer(questionDto.getAnswer());
-			// other mappings...
+	            test = testRepository.save(test);
 
-			question.setTest(test);
-			questionsRepository.save(question);
-		}
+	            for (QuestionDto questionDto : testDto.getQuestions()) {
+	                Questions question = new Questions();
+	                question.setQuestionId(questionDto.getQuestionId());
+	                question.setQuestion(questionDto.getQuestion());
+	                question.setOptionA(questionDto.getOptionA());
+	                question.setOptionB(questionDto.getOptionB());
+	                question.setOptionC(questionDto.getOptionC());
+	                question.setOptionD(questionDto.getOptionD());
+	                question.setAnswer(questionDto.getAnswer());
+	                // other mappings...
 
-		return testDto;
-	}
+	                question.setTest(test);
+	                questionsRepository.save(question);
+	            }
 
-	@Transactional(readOnly = true)
-	public List<Test> getAllTests() {
-
-		List<Test> testlist = testRepository.findAll();
-		return testlist;
-	}
-
-	// getting the questions based on the testId
-
-	public List<QuestionDto> getQuestionsByTestId(int testId) {
-		Optional<Test> opTest = testRepository.findById(testId);
-		if (opTest.isPresent()) {
-			System.out.println(opTest.get().getQuestions());
-			List<Questions> questions = opTest.get().getQuestions();
-			return convertToQuestionDto(questions);
-		}
-		return null;
-	}
-
-	private List<QuestionDto> convertToQuestionDto(List<Questions> questions) {
-		List<QuestionDto> questionDtos = new ArrayList<>();
-
-		for (Questions question : questions) {
-			QuestionDto questionDto = new QuestionDto();
-			questionDto.setQuestionId(question.getQuestionId());
-			questionDto.setQuestion(question.getQuestion());
-			questionDto.setOptionA(question.getOptionA());
-			questionDto.setOptionB(question.getOptionB());
-			questionDto.setOptionC(question.getOptionC());
-			questionDto.setOptionD(question.getOptionD());
-			questionDto.setAnswer(question.getAnswer());
-
-			questionDtos.add(questionDto);
-		}
-
-		return questionDtos;
-	}
+	            return testDto;
+	        } catch (Exception ex) {
+	            throw new TestServiceException("An error occurred while adding test with questions.");
+	        }
+	    }
 	
 	
-	//Method for enrolled user to getall questions
-	
 
+// AvailableTests logic for User and Admin.
+	 @Transactional(readOnly = true)
+	    public List<AvailableTestsDto> getAllTests() {
+	        try {
+	            List<Test> testList = testRepository.findAll();
+	            return convertToAvailableTestsDto(testList);
+	        } catch (Exception ex) {
+	            throw new TestServiceException("An error occurred while fetching available tests.");
+	        }
+	    }
+
+	    public List<AvailableTestsDto> convertToAvailableTestsDto(List<Test> testList) {
+	        return testList.stream()
+	                .map(test -> new AvailableTestsDto(test.getTestId(), test.getCourseType()))
+	                .collect(Collectors.toList());
+	    }
+
+	// getting the questions with answers based on the testId for admin.
+	    public List<QuestionDto> getQuestionsByTestId(int testId) {
+	        try {
+	            Optional<Test> opTest = testRepository.findById(testId);
+	            if (opTest.isPresent()) {
+	                List<Questions> questions = opTest.get().getQuestions();
+	                return convertToQuestionDto(questions);
+	            }
+	            throw new TestServiceException("Test not found for ID: " + testId);
+	        } catch (Exception ex) {
+	            throw new TestServiceException("An error occurred while fetching questions.");
+	        }
+	    }
+
+	    private List<QuestionDto> convertToQuestionDto(List<Questions> questions) {
+	        List<QuestionDto> questionDtos = new ArrayList<>();
+
+	        for (Questions question : questions) {
+	            QuestionDto questionDto = new QuestionDto();
+	            questionDto.setQuestionId(question.getQuestionId());
+	            questionDto.setQuestion(question.getQuestion());
+	            questionDto.setOptionA(question.getOptionA());
+	            questionDto.setOptionB(question.getOptionB());
+	            questionDto.setOptionC(question.getOptionC());
+	            questionDto.setOptionD(question.getOptionD());
+	            questionDto.setAnswer(question.getAnswer());
+
+	            questionDtos.add(questionDto);
+	        }
+
+	        return questionDtos;
+	    }
+	
+	
+	
+	
+	
+	//----Method for enrolled user to getall questions------.
 	
 	 public List<QuestionDto> getQuestionsForEnrolledUser(int userId, int testId) {
 	        Optional<User> opUser = userRepository.findById(userId);
@@ -136,8 +161,11 @@ public class TestServiceImpl implements TestService {
 
 	        throw new RuntimeException("User not found");
 	    }
-
-	 //User submitting and getting results
+	 
+	 
+//-----logic for User submitting answers and getting results of a particuar test(check UserController for Http Put request)
+	
+	 
 	 public TestResultDto submitAndCalculateScore(int userId, int testId, Map<Integer, String> userSelectedOptions) {
 		    Optional<User> opUser = userRepository.findById(userId);
 
@@ -185,7 +213,7 @@ public class TestServiceImpl implements TestService {
 		    }
 		}
 
-		private int calculateScore(List<Questions> questions, Map<Integer, String> userSelectedOptions) {
+		public int calculateScore(List<Questions> questions, Map<Integer, String> userSelectedOptions) {
 		    int score = 0;
 		    for (Questions question : questions) {
 		        int questionId = question.getQuestionId();
@@ -198,7 +226,7 @@ public class TestServiceImpl implements TestService {
 		    return score;
 		}
 
-		private List<ResultDto> displayAnswers(List<Questions> questions, Map<Integer, String> userSelectedOptions) {
+		public List<ResultDto> displayAnswers(List<Questions> questions, Map<Integer, String> userSelectedOptions) {
 		    return questions.stream()
 		            .map(question -> {
 		                int questionId = question.getQuestionId();
@@ -210,6 +238,7 @@ public class TestServiceImpl implements TestService {
 		            .collect(Collectors.toList());
 		}
 
+		
 
 	 
 	 

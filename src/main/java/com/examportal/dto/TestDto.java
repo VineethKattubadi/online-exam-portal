@@ -16,13 +16,13 @@ import jakarta.persistence.OneToMany;
 public class TestDto {
 
 	private int testId;
-	private char courseType;
+	private String courseType;
 	private List<QuestionDto> questions;
 	private List<AnswerDto> answers;
 	public TestDto() {
 		super();
 	}
-	public TestDto(int testId, char courseType, List<QuestionDto> questions, List<AnswerDto> answers) {
+	public TestDto(int testId, String courseType, List<QuestionDto> questions, List<AnswerDto> answers) {
 		super();
 		this.testId = testId;
 		this.courseType = courseType;
@@ -35,10 +35,10 @@ public class TestDto {
 	public void setTestId(int testId) {
 		this.testId = testId;
 	}
-	public char getCourseType() {
+	public String getCourseType() {
 		return courseType;
 	}
-	public void setCourseType(char courseType) {
+	public void setCourseType(String courseType) {
 		this.courseType = courseType;
 	}
 	public List<QuestionDto> getQuestions() {
@@ -54,5 +54,10 @@ public class TestDto {
 		this.answers = answers;
 	}
 	
-
+	 public void setTestProperties(int testId, String courseType, List<QuestionDto> questions, List<AnswerDto> answers) {
+	        this.testId = testId;
+	        this.courseType = courseType;
+	        this.questions = questions;
+	        this.answers = answers;
+	    }
 }

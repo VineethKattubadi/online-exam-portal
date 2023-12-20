@@ -1,9 +1,7 @@
 package com.examportal.entity;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -17,12 +15,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
+
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+
 
 @Entity
 @Table(name="user_results")
@@ -45,6 +42,9 @@ public class UserResults{
 	@JoinColumn(name="test_id")
 	private Test test;
 	
+	@ManyToOne
+	private UsersHistory usersHistory;
+	
 	@ElementCollection
     @CollectionTable(name = "user_result_mapping", joinColumns = @JoinColumn(name = "user_result_id"))
     @MapKeyColumn(name = "question_id")
@@ -62,6 +62,15 @@ public class UserResults{
 		this.examDate = examDate;
 		this.examScore = examScore;
 		this.test = test;
+	}
+
+	
+	public UserResults(int resultId, User user, LocalDate examDate, int examScore) {
+		super();
+		this.resultId = resultId;
+		this.user = user;
+		this.examDate = examDate;
+		this.examScore = examScore;
 	}
 
 	public int getResultId() {

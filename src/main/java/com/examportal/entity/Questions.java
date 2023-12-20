@@ -44,6 +44,8 @@ public class Questions {
 	@JoinColumn(name = "test_id")  // Make sure the name matches the column name in the Test entity
 	private Test test;
 
+	
+
 	public Questions() {
 		super();
 	}

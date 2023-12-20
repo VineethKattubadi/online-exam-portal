@@ -1,4 +1,4 @@
-package com.examportal.controller;
+ package com.examportal.controller;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -54,26 +55,14 @@ public class TestController {
 	private QuestionsRepository questionsRepository;
 
 	
-//	@GetMapping("/{testId}/questions")
-//	public ResponseEntity<List<QuestionDto>> getQuestions() {
-//		return ResponseEntity.ok(testService.getAllTests().get(0).getQuestions());
-//	}
-	
 
-//	@GetMapping("/user-test-questions")
-//    public ResponseEntity<List<QuestionDto>> getQuestionsForEnrolledUser(@RequestParam int userId, @RequestParam int testId) {
-//        try {
-//            List<QuestionDto> questionsDto = testService.getQuestionsForEnrolledUser(userId, testId);
-//            return ResponseEntity.ok(questionsDto);
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-//        }
-//    }
-//	
+	
+//This Method is for user,to get Questions for writing the exam.
+	
 	 private static final int QUESTION_DURATION_MINUTES = 2;
 
-	    @GetMapping("/user-test-questions")
-	    public ResponseEntity<List<QuestionDto>> getQuestionsForEnrolledUser(@RequestParam int userId, @RequestParam int testId,  HttpSession sessionManager) {
+	    @GetMapping("/user-test-questions/{userId}/{testId}")
+	    public ResponseEntity<List<QuestionDto>> getQuestionsForEnrolledUser(@PathVariable int userId, @PathVariable int testId,  HttpSession sessionManager) {
 	        Optional<User> opUser = userRepository.findById(userId);
 
 	        if (opUser.isPresent()) {
@@ -127,6 +116,6 @@ public class TestController {
 	        return 0;
 	    }
 	
-	 
+	   
 
 }

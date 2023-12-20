@@ -43,12 +43,20 @@ public class User {
 	@ManyToMany
 	private List<Test> test;
 	@OneToMany(mappedBy = "user")
-	private List<UserResults> userresults;
+	private List<UserResults> userResults;
 
 	@OneToOne
 	private UsersHistory usersHistory;
 	
 	
+
+	public User(int userId, String userName, String userMail, String userPassword) {
+		super();
+		this.userId = userId;
+		this.userName = userName;
+		this.userMail = userMail;
+		this.userPassword = userPassword;
+	}
 
 	@ManyToMany
 	@JoinTable(name = "user_enrolled_tests", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "test_id"))
@@ -108,12 +116,12 @@ public class User {
 		this.userAddress = userAddress;
 	}
 
-	public List<UserResults> getUserresults() {
-		return userresults;
+	public List<UserResults> getUserResults() {
+		return userResults;
 	}
 
-	public void setUserresults(List<UserResults> userresults) {
-		this.userresults = userresults;
+	public void setUserResults(List<UserResults> userResults) {
+		this.userResults = userResults;
 	}
 
 	public String getUserPassword() {

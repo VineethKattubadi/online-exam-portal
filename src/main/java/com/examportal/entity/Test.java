@@ -25,7 +25,7 @@ public class Test {
 	private int testId;
 	
 	@Column(name="course_Type")
-	private char courseType;
+	private String courseType;
 	
 	@ManyToOne
 	private Admin admin;
@@ -39,6 +39,8 @@ public class Test {
 	
 	@ManyToMany(mappedBy="test")
 	private List<User> users;
+	@ManyToOne
+	private UsersHistory usersHistory;
 	
 	
 
@@ -46,7 +48,7 @@ public class Test {
 		super();
 	}
 
-	public Test(int testId, char courseType, Admin admin, List<Questions> questions, List<UserResults> userResults,
+	public Test(int testId, String courseType, Admin admin, List<Questions> questions, List<UserResults> userResults,
 			List<User> users) {
 		super();
 		this.testId = testId;
@@ -65,11 +67,11 @@ public class Test {
 		this.testId = testId;
 	}
 
-	public char getCourseType() {
+	public String getCourseType() {
 		return courseType;
 	}
 
-	public void setCourseType(char courseType) {
+	public void setCourseType(String courseType) {
 		this.courseType = courseType;
 	}
 
@@ -103,6 +105,20 @@ public class Test {
 
 	public void setUsers(List<User> users) {
 		this.users = users;
+	}
+
+	public UsersHistory getUsersHistory() {
+		return usersHistory;
+	}
+
+	public void setUsersHistory(UsersHistory usersHistory) {
+		this.usersHistory = usersHistory;
+	}
+
+	public Test(int testId, String courseType) {
+		super();
+		this.testId = testId;
+		this.courseType = courseType;
 	}
 
 	
